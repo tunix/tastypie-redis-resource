@@ -23,9 +23,9 @@ class RedisResource(Resource):
 
     def get_key(self, id=None):
         if id:
-            return '%s:%s' % (self.collection, id)
+            return '%s:%s' % (self._meta.collection, id)
 
-        return self.collection
+        return self._meta.collection
 
     def obj_get_list(self, request=None, **kwargs):
         """
