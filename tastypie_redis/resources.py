@@ -31,7 +31,18 @@ class RedisResource(Resource):
         """
         Maps redis documents to an object class.
         """
-        return list(map(self.get_object_class(), self.get_database().members(self.get_key())))
+        db = self.get_database()
+        result = []
+
+        for oid in db.smembers(self.get_key()):
+            obj = self.get_object_class()()
+
+            for k, v in db.hgetall(oid).items():
+                setattr(obj, k.decode('UTF-8'), v.decode('UTF-8'))
+
+            result.append(obj)
+
+        return result
 
     def obj_get(self, request=None, **kwargs):
         """
