@@ -21,7 +21,7 @@ class RedisResource(Resource):
         """
         raise NotImplementedError("You should implement get_database method.")
 
-    def get_key(self, id=None):
+    def _get_key(self, id=None):
         if id:
             return '%s:%s' % (self._meta.collection, id)
 
@@ -34,7 +34,7 @@ class RedisResource(Resource):
         db = self.get_database()
         result = []
 
-        for oid in db.smembers(self.get_key()):
+        for oid in db.smembers(self._get_key()):
             obj = self.get_object_class()()
 
             for k, v in db.hgetall(oid).items():
@@ -48,9 +48,18 @@ class RedisResource(Resource):
         """
         Returns redis document from provided id.
         """
-        return self.get_object_class()(
-            self.get_database().hget(self.get_key(kwargs.get("pk")))
-        )
+        db = self.get_database()
+        result = db.hgetall(self._get_key(kwargs.get("pk")))
+
+        if result:
+            basket = self.get_object_class()()
+
+            for k, v in result.items():
+                setattr(basket, k.decode('UTF-8'), v.decode('UTF-8'))
+
+            return basket
+
+        return None
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -58,7 +67,7 @@ class RedisResource(Resource):
         """
         bundle.data.update(kwargs)
         bundle.obj = self.get_database().hmset(
-            self.get_key(kwargs.get("pk")),
+            self._get_key(kwargs.get("pk")),
             bundle.data
         )
         return bundle
