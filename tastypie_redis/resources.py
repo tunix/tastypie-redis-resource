@@ -2,6 +2,7 @@
 
 from bson import ObjectId
 
+from django.core.exceptions import ObjectDoesNotExist
 from tastypie.bundle import Bundle
 from tastypie.resources import Resource
 
@@ -59,7 +60,7 @@ class RedisResource(Resource):
 
             return basket
 
-        return None
+        raise ObjectDoesNotExist
 
     def obj_create(self, bundle, **kwargs):
         """
