@@ -53,12 +53,12 @@ class RedisResource(Resource):
         result = db.hgetall(self._get_key(kwargs.get("pk")))
 
         if result:
-            basket = self.get_object_class()()
+            obj = self.get_object_class()()
 
             for k, v in result.items():
-                setattr(basket, k.decode('UTF-8'), v.decode('UTF-8'))
+                setattr(obj, k.decode('UTF-8'), v.decode('UTF-8'))
 
-            return basket
+            return obj
 
         raise ObjectDoesNotExist
 
@@ -73,28 +73,30 @@ class RedisResource(Resource):
         )
         return bundle
 
-    def obj_update(self, bundle, request=None, **kwargs):
+    def obj_update(self, bundle, **kwargs):
         """
         Updates redis document.
         """
-        self.get_database().update(
-            {"_id": ObjectId(kwargs.get("pk"))},
-            {"$set": bundle.data}
-        )
-        return bundle
+        return self.obj_create(bundle, **kwargs)
 
     def obj_delete(self, request=None, **kwargs):
         """
         Removes single document from collection
         """
-        parameters = {"_id": ObjectId(kwargs.get("pk"))}
-        self.get_database().remove(parameters)
+        db = self.get_database()
+        key = self._get_key(kwargs.get("pk"))
+
+        if not db.exists(key):
+            raise ObjectDoesNotExist
+
+        db.srem(self._meta.collection, key)
+        db.delete(key)
 
     def obj_delete_list(self, request=None, **kwargs):
         """
         Removes all documents from collection
         """
-        self.get_database().remove()
+        self.get_database().flushdb()
 
     def detail_uri_kwargs(self, bundle_or_obj):
         """
