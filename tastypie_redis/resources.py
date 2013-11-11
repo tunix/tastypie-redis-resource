@@ -28,6 +28,9 @@ class RedisResource(Resource):
 
         return self._meta.collection
 
+    def get_object_list(self, request):
+        return self.obj_get_list(request)
+
     def obj_get_list(self, request=None, **kwargs):
         """
         Maps redis documents to an object class.
