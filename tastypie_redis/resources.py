@@ -29,7 +29,9 @@ class RedisResource(Resource):
         return self._meta.collection
 
     def get_object_list(self, request):
-        return self.obj_get_list(request)
+        bundle = self.build_bundle(request=request)
+
+        return self.obj_get_list(bundle)
 
     def obj_get_list(self, bundle, **kwargs):
         """
