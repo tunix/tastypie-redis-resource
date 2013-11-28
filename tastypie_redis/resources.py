@@ -46,7 +46,7 @@ class RedisResource(Resource):
 
             result.append(obj)
 
-        return result
+        return self.authorized_read_list(result, bundle)
 
     def obj_get(self, bundle, **kwargs):
         """
@@ -61,7 +61,7 @@ class RedisResource(Resource):
             for k, v in result.items():
                 setattr(obj, k.decode('UTF-8'), v.decode('UTF-8'))
 
-            return obj
+            return self.authorized_read_detail(obj, bundle)
 
         raise ObjectDoesNotExist
 
@@ -70,6 +70,9 @@ class RedisResource(Resource):
         Creates redis document from POST data.
         """
         bundle.data.update(kwargs)
+
+        self.authorized_create_detail(bundle.data, bundle)
+
         bundle.obj = self.get_database().hmset(
             self._get_key(kwargs.get("pk")),
             bundle.data
@@ -81,6 +84,9 @@ class RedisResource(Resource):
         """
         Updates redis document.
         """
+
+        self.authorized_update_detail(bundle.data, bundle)
+
         return self.obj_create(bundle, **kwargs)
 
     def obj_delete(self, bundle, **kwargs):
@@ -93,6 +99,8 @@ class RedisResource(Resource):
         if not db.exists(key):
             raise ObjectDoesNotExist
 
+        self.authorized_delete_detail(key, bundle)
+
         db.srem(self._meta.collection, key)
         db.delete(key)
 
@@ -100,6 +108,8 @@ class RedisResource(Resource):
         """
         Removes all documents from collection
         """
+
+        self.authorized_delete_list(bundle.data, bundle)
         self.get_database().flushdb()
 
     def detail_uri_kwargs(self, bundle_or_obj):
