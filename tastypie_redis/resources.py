@@ -63,7 +63,9 @@ class RedisResource(Resource):
             for k, v in result.items():
                 setattr(obj, k.decode('UTF-8'), v.decode('UTF-8'))
 
-            return self.authorized_read_detail(obj, bundle)
+            self.authorized_read_detail(obj, bundle)
+
+            return obj
 
         raise ObjectDoesNotExist
 
