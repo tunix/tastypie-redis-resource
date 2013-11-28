@@ -31,7 +31,7 @@ class RedisResource(Resource):
     def get_object_list(self, request):
         return self.obj_get_list(request)
 
-    def obj_get_list(self, request=None, **kwargs):
+    def obj_get_list(self, bundle, **kwargs):
         """
         Maps redis documents to an object class.
         """
@@ -48,7 +48,7 @@ class RedisResource(Resource):
 
         return result
 
-    def obj_get(self, request=None, **kwargs):
+    def obj_get(self, bundle, **kwargs):
         """
         Returns redis document from provided id.
         """
@@ -74,6 +74,7 @@ class RedisResource(Resource):
             self._get_key(kwargs.get("pk")),
             bundle.data
         )
+
         return bundle
 
     def obj_update(self, bundle, **kwargs):
@@ -82,7 +83,7 @@ class RedisResource(Resource):
         """
         return self.obj_create(bundle, **kwargs)
 
-    def obj_delete(self, request=None, **kwargs):
+    def obj_delete(self, bundle, **kwargs):
         """
         Removes single document from collection
         """
@@ -95,7 +96,7 @@ class RedisResource(Resource):
         db.srem(self._meta.collection, key)
         db.delete(key)
 
-    def obj_delete_list(self, request=None, **kwargs):
+    def obj_delete_list(self, bundle, **kwargs):
         """
         Removes all documents from collection
         """
