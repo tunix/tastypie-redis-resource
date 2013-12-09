@@ -1,10 +1,8 @@
 # coding: utf-8
 
-from bson import ObjectId
-
-from django.core.exceptions import ObjectDoesNotExist
 from tastypie.bundle import Bundle
 from tastypie.resources import Resource
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class RedisResource(Resource):
@@ -123,14 +121,12 @@ class RedisResource(Resource):
 
         By default, it uses the model's ``pk`` in order to create the URI.
         """
+
         detail_uri_name = getattr(self._meta, 'detail_uri_name', 'pk')
         kwargs = {}
 
         if isinstance(bundle_or_obj, Bundle):
-            if isinstance(bundle_or_obj.obj, ObjectId):
-                kwargs[detail_uri_name] = str(bundle_or_obj.obj)
-            else:
-                kwargs[detail_uri_name] = getattr(bundle_or_obj.obj, detail_uri_name)
+            kwargs[detail_uri_name] = getattr(bundle_or_obj.obj, detail_uri_name)
         else:
             kwargs[detail_uri_name] = getattr(bundle_or_obj, detail_uri_name)
 
