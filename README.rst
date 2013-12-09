@@ -4,12 +4,6 @@ Redis Resource for Tastypie
 
 Allows you to create delicious APIs for Redis.
 
------------------
-Py2k Dependencies
------------------
-
-* bson >= 0.3.3
-
 --------
 Settings
 --------
