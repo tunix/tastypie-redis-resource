@@ -3,6 +3,7 @@
 from tastypie.bundle import Bundle
 from tastypie.resources import Resource
 from tastypie.exceptions import NotFound
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -67,7 +68,7 @@ class RedisResource(Resource):
 
             return obj
 
-        raise NotFound(_("No basket found with key: %s") % key)
+        raise ObjectDoesNotExist
 
     def obj_create(self, bundle, **kwargs):
         """
