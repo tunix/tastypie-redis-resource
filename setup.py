@@ -13,7 +13,7 @@ def read(fname):
 
 setup(
     name="tastypie-redis-resource",
-    version="0.0.6",
+    version="0.0.7",
     author="Alper Kanat",
     author_email="tunix@raptiye.org",
     description=("Tastypie Redis Resource"),
