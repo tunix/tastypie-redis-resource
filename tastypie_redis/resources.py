@@ -2,7 +2,8 @@
 
 from tastypie.bundle import Bundle
 from tastypie.resources import Resource
-from django.core.exceptions import ObjectDoesNotExist
+from tastypie.exceptions import NotFound
+from django.utils.translation import ugettext_lazy as _
 
 
 class RedisResource(Resource):
@@ -53,7 +54,8 @@ class RedisResource(Resource):
         Returns redis document from provided id.
         """
         db = self.get_database()
-        result = db.hgetall(self._get_key(kwargs.get("pk")))
+        key = self._get_key(kwargs.get("pk"))
+        result = db.hgetall(key)
 
         if result:
             obj = self.get_object_class()()
@@ -65,7 +67,7 @@ class RedisResource(Resource):
 
             return obj
 
-        raise ObjectDoesNotExist
+        raise NotFound(_("No basket found with key: %s") % key)
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -99,7 +101,7 @@ class RedisResource(Resource):
         key = self._get_key(kwargs.get("pk"))
 
         if not db.exists(key):
-            raise ObjectDoesNotExist
+            raise NotFound(_("No basket found with key: %s") % key)
 
         self.authorized_delete_detail(key, bundle)
 
