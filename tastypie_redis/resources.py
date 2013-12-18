@@ -106,8 +106,11 @@ class RedisResource(Resource):
 
         self.authorized_delete_detail(key, bundle)
 
-        db.srem(self._meta.collection, key)
-        db.delete(key)
+        if db.sismember(self._meta.collection, key):
+            db.srem(self._meta.collection, key)
+
+        if db.exists(key):
+            db.delete(key)
 
     def obj_delete_list(self, bundle, **kwargs):
         """
